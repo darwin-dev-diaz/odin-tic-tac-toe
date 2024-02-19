@@ -80,7 +80,7 @@ const GameController = (function () {
     { name: "player2", marker: "O" },
   ];
   let currentPlayer = players[0];
-  
+
   const switchCurrentPlayer = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
   };
@@ -89,12 +89,28 @@ const GameController = (function () {
   };
 
   const printNewRound = () => {
-
+    console.log(GameBoard.returnBoard());
+    console.log(`It's ${currentPlayer.name}'s turn`);
   };
 
+  const playRound = () => {
+    while (true) {
+      printNewRound();
+      const row = prompt("Enter row");
+      const col = prompt("Enter col");
+
+      if (GameBoard.updateBoard(row, col, currentPlayer.marker)) {
+        switchCurrentPlayer();
+        break;
+      } else {
+        alert("Enter a valid position");
+      }
+    }
+  };
 
   return {
     switchCurrentPlayer,
-
+    getCurrentPlayer,
+    playRound,
   };
 })();
