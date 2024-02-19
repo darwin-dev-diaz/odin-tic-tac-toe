@@ -74,8 +74,19 @@ function createCell() {
   return { getMarker, updateMarker };
 }
 
-GameBoard.updateBoard(0, 2, 7);
-GameBoard.updateBoard(1, 1, 7);
-GameBoard.updateBoard(2, 0, 7);
-console.log(GameBoard.returnBoard());
-console.log(GameBoard.checkWinner("7"));
+const GameController = (function () {
+  const players = [
+    { name: "player1", marker: "X" },
+    { name: "player2", marker: "O" },
+  ];
+  let currentPlayer = players[0];
+  const switchCurrentPlayer = () => {
+    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+  };
+
+
+  return {
+    switchCurrentPlayer,
+    
+  };
+})();
