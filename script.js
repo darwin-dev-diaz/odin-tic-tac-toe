@@ -17,7 +17,7 @@ const GameBoard = (function () {
     let str = "";
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
-        str = str.concat(board[i][j].marker);
+        str = str.concat(board[i][j].getMarker());
       }
       str = str.concat("\n");
     }
@@ -25,8 +25,8 @@ const GameBoard = (function () {
   };
 
   const updateBoard = (row, col, newMarker) => {
-    if (board[row][col].marker === "#") {
-      board[row][col].marker = newMarker;
+    if (board[row][col].getMarker() === "#") {
+      board[row][col].updateMarker(newMarker);
       return true;
     }
     return false;
@@ -34,7 +34,7 @@ const GameBoard = (function () {
 
   const checkWinner = (marker) => {
     const str = board
-      .flatMap((innerArr) => innerArr.map((cell) => cell.marker))
+      .flatMap((innerArr) => innerArr.map((cell) => cell.getMarker()))
       .join("");
     const horizontalWin = new RegExp(
       `^${marker}{3}......|...${marker}{3}...|......${marker}{3}$`,
@@ -46,20 +46,12 @@ const GameBoard = (function () {
       "g"
     );
 
-    for(let i = 0; i < 3; i ++){
+    for (let i = 0; i < 3; i++) {
       if (str.match([horizontalWin, verticalWin, diagonalWin][i])) {
         return true;
       }
     }
     return false;
-    // [horizontalWin, verticalWin, diagonalWin].forEach((regex) => {
-    //   console.log(str.match(regex));
-    //   if (str.match(regex)) {
-    //     break;
-    //     return true;
-    //   }
-    //   return false;
-    // });
   };
 
   return {
@@ -75,13 +67,15 @@ function createCell() {
   const updateMarker = (newMarker) => {
     marker = newMarker;
   };
+  const getMarker = () => {
+    return marker;
+  };
 
-  return { marker, updateMarker };
+  return { getMarker, updateMarker };
 }
 
-// console.log(GameBoard.returnBoard());
 GameBoard.updateBoard(0, 2, 7);
 GameBoard.updateBoard(1, 1, 7);
 GameBoard.updateBoard(2, 0, 7);
 console.log(GameBoard.returnBoard());
-console.log(GameBoard.checkWinner('7'));
+console.log(GameBoard.checkWinner("7"));
