@@ -80,13 +80,21 @@ const GameController = (function () {
     { name: "player2", marker: "O" },
   ];
   let currentPlayer = players[0];
+  
   const switchCurrentPlayer = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+  };
+  const getCurrentPlayer = () => {
+    return currentPlayer;
+  };
+
+  const printNewRound = () => {
+
   };
 
 
   return {
     switchCurrentPlayer,
-    
+
   };
 })();
