@@ -89,28 +89,38 @@ const GameController = (function () {
     console.log(GameBoard.returnBoard());
     console.log(`It's ${currentPlayer.name}'s turn`);
   };
-
+  
   const playRound = () => {
     while (true) {
       printNewRound();
       const row = prompt("Enter row");
       const col = prompt("Enter col");
-
+      
       if (GameBoard.updateBoard(row, col, currentPlayer.marker)) {
-        if(GameBoard.checkWinner(currentPlayer.marker)){
-          alert(currentPlayer.name + " wins!");
-          GameBoard.resetBoard();
-        }
-        switchCurrentPlayer();
         break;
       } else {
         alert("Enter a valid position!");
       }
     }
   };
+  
+  const playGame = () => {
+    while (true) {
+      playRound();
+      if (GameBoard.checkWinner(currentPlayer.marker)) {
+        console.log(GameBoard.returnBoard());
+        console.log(currentPlayer.name + " WINS!");
+        GameBoard.resetBoard();
+        break;
+      }
+      switchCurrentPlayer();
+    }
+  };
 
   return {
-    switchCurrentPlayer,
-    playRound,
+    playGame,
   };
 })();
+
+
+GameController.playGame();
