@@ -84,9 +84,6 @@ const GameController = (function () {
   const switchCurrentPlayer = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
   };
-  const getCurrentPlayer = () => {
-    return currentPlayer;
-  };
 
   const printNewRound = () => {
     console.log(GameBoard.returnBoard());
@@ -100,17 +97,20 @@ const GameController = (function () {
       const col = prompt("Enter col");
 
       if (GameBoard.updateBoard(row, col, currentPlayer.marker)) {
+        if(GameBoard.checkWinner(currentPlayer.marker)){
+          alert(currentPlayer.name + " wins!");
+          GameBoard.resetBoard();
+        }
         switchCurrentPlayer();
         break;
       } else {
-        alert("Enter a valid position");
+        alert("Enter a valid position!");
       }
     }
   };
 
   return {
     switchCurrentPlayer,
-    getCurrentPlayer,
     playRound,
   };
 })();
