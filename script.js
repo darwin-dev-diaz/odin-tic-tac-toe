@@ -1,6 +1,7 @@
 const gameBoardDOM = document.querySelector(".GameBoardDOM");
 const cellsDOM = document.querySelectorAll(".cell");
-const testCellDOM = document.querySelector(".cell");
+const displayScreen = document.querySelector('h2');
+
 function returnXSVG() {
   const xSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   xSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -165,19 +166,24 @@ const GameController = (function () {
 
 cellsDOM.forEach((cell, i) => {
   cell.addEventListener("click", () => {
+    let message = '';
     const row = Math.floor(i / 3);
     const col = i % 3;
 
     GameController.playRound(row, col, cell);
     if (GameBoard.checkWinner(GameController.getCurrentPlayer().marker)) {
-      console.log(`${GameController.getCurrentPlayer().name} wins!`);
+      message = `${GameController.getCurrentPlayer().name} wins!`;
       GameBoard.resetBoard();
       GameController.switchCurrentPlayer(true);
     } else if (GameBoard.checkTie()) {
       GameBoard.resetBoard();
       GameController.switchCurrentPlayer(true);
+      message = `TIE! ${GameController.getCurrentPlayer().name}'s turn`;
     } else {
       GameController.switchCurrentPlayer();
+      message = `${GameController.getCurrentPlayer().name}'s turn`;
     }
+
+    displayScreen.textContent = message;
   });
 });
