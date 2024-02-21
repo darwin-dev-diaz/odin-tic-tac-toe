@@ -1,6 +1,43 @@
+const gameBoardDOM = document.querySelector(".GameBoardDOM");
+const cellsDOM = document.querySelectorAll(".cell");
+const testCellDOM = document.querySelector(".cell");
+function returnXSVG() {
+  const xSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  xSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  xSVG.setAttribute("viewBox", "0 0 24 24");
+  const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+  title.textContent = "alpha-x-circle";
+  xSVG.appendChild(title);
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "M9,7L11,12L9,17H11L12,14.5L13,17H15L13,12L15,7H13L12,9.5L11,7H9M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z"
+  );
+  xSVG.appendChild(path);
+
+  return xSVG;
+}
+function returnOSVG() {
+  const oSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  oSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  oSVG.setAttribute("viewBox", "0 0 24 24");
+  const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+  title.textContent = "alpha-o-circle";
+  oSVG.appendChild(title);
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "M11,7A2,2 0 0,0 9,9V15A2,2 0 0,0 11,17H13A2,2 0 0,0 15,15V9A2,2 0 0,0 13,7H11M11,9H13V15H11V9M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z"
+  );
+  oSVG.appendChild(path);
+
+  return oSVG;
+}
+
 const GameBoard = (function () {
   let board = [];
 
+  //working with DOM
   const resetBoard = () => {
     board = [];
     for (let rows = 0; rows < 3; rows++) {
@@ -10,6 +47,8 @@ const GameBoard = (function () {
       }
       board.push(row);
     }
+
+    cellsDOM.forEach((cell) => (cell.innerHTML = ""));
   };
   resetBoard();
 
@@ -24,9 +63,11 @@ const GameBoard = (function () {
     return str;
   };
 
-  const updateBoard = (row, col, newMarker) => {
+  //WORKING WITH DOM
+  const updateBoard = (row, col, newMarker, domCELL) => {
     if (board[row][col].getMarker() === "#") {
       board[row][col].updateMarker(newMarker);
+      domCELL.appendChild(newMarker === "X" ? returnXSVG() : returnOSVG());
       return true;
     }
     return false;
@@ -54,11 +95,23 @@ const GameBoard = (function () {
     return false;
   };
 
+  const checkTie = () => {
+    const str = board
+      .flatMap((innerArr) => innerArr.map((cell) => cell.getMarker()))
+      .join("");
+    if (!str.includes("#")) {
+      console.log("It's a tie");
+      return true;
+    }
+    return false;
+  };
+
   return {
     resetBoard,
     returnBoard,
     updateBoard,
     checkWinner,
+    checkTie,
   };
 })();
 
@@ -81,46 +134,50 @@ const GameController = (function () {
   ];
   let currentPlayer = players[0];
 
-  const switchCurrentPlayer = () => {
-    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+  const switchCurrentPlayer = (reset = false) => {
+    if (reset) {
+      currentPlayer = players[0];
+    } else {
+      currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+    }
   };
 
-  const printNewRound = () => {
-    console.log(GameBoard.returnBoard());
-    console.log(`It's ${currentPlayer.name}'s turn`);
+  const getCurrentPlayer = () => {
+    return currentPlayer;
   };
-  
-  const playRound = () => {
-    while (true) {
-      printNewRound();
-      const row = prompt("Enter row");
-      const col = prompt("Enter col");
-      
-      if (GameBoard.updateBoard(row, col, currentPlayer.marker)) {
-        break;
-      } else {
-        alert("Enter a valid position!");
-      }
+
+  const printNewRound = () => {};
+
+  const playRound = (row, col, domCELL) => {
+    if (GameBoard.updateBoard(row, col, currentPlayer.marker, domCELL)) {
+    } else {
+      alert("Enter a valid position!");
     }
-  };
-  
-  const playGame = () => {
-    while (true) {
-      playRound();
-      if (GameBoard.checkWinner(currentPlayer.marker)) {
-        console.log(GameBoard.returnBoard());
-        console.log(currentPlayer.name + " WINS!");
-        GameBoard.resetBoard();
-        break;
-      }
-      switchCurrentPlayer();
-    }
+    printNewRound();
   };
 
   return {
-    playGame,
+    playRound,
+    getCurrentPlayer,
+    switchCurrentPlayer,
   };
 })();
 
+cellsDOM.forEach((cell, i) => {
+  cell.addEventListener("click", () => {
+    const row = Math.floor(i / 3);
+    const col = i % 3;
 
-GameController.playGame();
+    GameController.playRound(row, col, cell);
+    if (GameBoard.checkWinner(GameController.getCurrentPlayer().marker)) {
+      console.log(`${GameController.getCurrentPlayer().name} wins!`);
+      GameBoard.resetBoard();
+      GameController.switchCurrentPlayer(true);
+    } else if (GameBoard.checkTie()) {
+      GameBoard.resetBoard();
+      GameController.switchCurrentPlayer(true);
+    } else {
+      GameController.switchCurrentPlayer();
+    }
+  });
+});

@@ -1,0 +1,47 @@
+:root {
+  --mon-black: #272821;
+  --mon-red: #fb0170;
+  --mon-purple: #ad79f5;
+  --mon-blue: #13dcf2;
+  --mon-green: #94e400;
+  --mon-orange: #e78403;
+  --mon-yellow: #ded15e;
+  --mon-grey: #3e3d32;
+  --mon-white: #f8f8f1;
+}
+
+body {
+  background-color: var(--mon-white);
+  color: var(--mon-black);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 135px;
+  align-items: center;
+  /* justify-content: center; */
+}
+
+h1 {
+  font-family: "Inconsolata";
+  letter-spacing: -5px;
+  font-size: 75px;
+  margin-top: 90px;
+}
+
+.GameBoardDOM {
+  background-color: var(--mon-grey);
+  width: 400px;
+  height: 400px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.cell {
+  background-color: var(--mon-white);
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
