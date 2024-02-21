@@ -102,7 +102,7 @@ const GameBoard = (function () {
     const str = board
       .flatMap((innerArr) => innerArr.map((cell) => cell.getMarker()))
       .join("");
-      let returnArr = [];
+    let returnArr = [];
     const h1 = {
       regex: `^${marker}{3}......$`,
       coords: [0, 1, 2],
@@ -149,7 +149,6 @@ const GameBoard = (function () {
       .flatMap((innerArr) => innerArr.map((cell) => cell.getMarker()))
       .join("");
     if (!str.includes("#")) {
-      console.log("It's a tie");
       return true;
     }
     return false;
@@ -213,26 +212,41 @@ const GameController = (function () {
   };
 })();
 
+let resetState = false;
 cellsDOM.forEach((cell, i) => {
   cell.addEventListener("click", () => {
-    let message = "";
+    let message = "X's turn";
     const row = Math.floor(i / 3);
     const col = i % 3;
-
-    GameController.playRound(row, col, cell);
-    if (GameBoard.checkWinner(GameController.getCurrentPlayer().marker)) {
-      message = `${GameController.getCurrentPlayer().name} wins!`;
-      const winIndices = GameBoard.returnWinnerCoords(GameController.getCurrentPlayer().marker);
-      winIndices.forEach(index=>cellsDOM[index].children[0].style.fill = 'var(--mon-yellow)');
-      // GameBoard.resetBoard();
-      GameController.switchCurrentPlayer(true);
-    } else if (GameBoard.checkTie()) {
+    if (resetState) {
       GameBoard.resetBoard();
-      GameController.switchCurrentPlayer(true);
-      message = `TIE! ${GameController.getCurrentPlayer().name}'s turn`;
+      resetState = false;
     } else {
-      GameController.switchCurrentPlayer();
-      message = `${GameController.getCurrentPlayer().name}'s turn`;
+      GameController.playRound(row, col, cell);
+      if (GameBoard.checkWinner(GameController.getCurrentPlayer().marker)) {
+        message = `${
+          GameController.getCurrentPlayer().name
+        } wins! Click any space to reset.`;
+        const winIndices = GameBoard.returnWinnerCoords(
+          GameController.getCurrentPlayer().marker
+        );
+        winIndices.forEach(
+          (index) =>
+            (cellsDOM[index].children[0].style.fill = "var(--mon-yellow)")
+        );
+        resetState = true;
+        GameController.switchCurrentPlayer(true);
+      } else if (GameBoard.checkTie()) {
+        GameController.switchCurrentPlayer(true);
+        message = `TIE! Click any space to reset.`;
+        cellsDOM.forEach((cell) => {
+          cell.children[0].style.fill = "var(--mon-grey)";
+        });
+        resetState = true;
+      } else {
+        GameController.switchCurrentPlayer();
+        message = `${GameController.getCurrentPlayer().name}'s turn`;
+      }
     }
 
     displayScreen.textContent = message;
