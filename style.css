@@ -59,6 +59,18 @@ h2{
   width: 100%;
   height: 100%;
   cursor: pointer;
-  /* border-radius: -10px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+}
+.marker-svg{
+  height: 100px;
+  width: 100px;
+}
+.x-svg{
+  fill: var(--mon-red);
+}
+.o-svg{
+  fill: var(--mon-blue);
 }

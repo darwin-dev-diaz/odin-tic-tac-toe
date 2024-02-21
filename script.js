@@ -1,11 +1,12 @@
 const gameBoardDOM = document.querySelector(".GameBoardDOM");
 const cellsDOM = document.querySelectorAll(".cell");
-const displayScreen = document.querySelector('h2');
+const displayScreen = document.querySelector("h2");
 
 function returnXSVG() {
   const xSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   xSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   xSVG.setAttribute("viewBox", "0 0 24 24");
+  xSVG.classList.add("marker-svg", "x-svg");
   const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
   title.textContent = "alpha-x-circle";
   xSVG.appendChild(title);
@@ -22,6 +23,7 @@ function returnOSVG() {
   const oSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   oSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   oSVG.setAttribute("viewBox", "0 0 24 24");
+  oSVG.classList.add("marker-svg", "o-svg");
   const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
   title.textContent = "alpha-o-circle";
   oSVG.appendChild(title);
@@ -96,6 +98,52 @@ const GameBoard = (function () {
     return false;
   };
 
+  const returnWinnerCoords = (marker) => {
+    const str = board
+      .flatMap((innerArr) => innerArr.map((cell) => cell.getMarker()))
+      .join("");
+      let returnArr = [];
+    const h1 = {
+      regex: `^${marker}{3}......$`,
+      coords: [0, 1, 2],
+    };
+    const h2 = {
+      regex: `^...${marker}{3}...$`,
+      coords: [3, 4, 5],
+    };
+    const h3 = {
+      regex: `^......${marker}{3}$`,
+      coords: [6, 7, 8],
+    };
+    const v1 = {
+      regex: `^${marker}..${marker}..${marker}..$`,
+      coords: [0, 3, 6],
+    };
+    const v2 = {
+      regex: `^.${marker}..${marker}..${marker}.$`,
+      coords: [1, 4, 7],
+    };
+    const v3 = {
+      regex: `^..${marker}..${marker}..${marker}$`,
+      coords: [2, 5, 8],
+    };
+    const d1 = {
+      regex: `^${marker}...${marker}...${marker}$`,
+      coords: [0, 4, 8],
+    };
+    const d2 = {
+      regex: `^..${marker}.${marker}.${marker}..$`,
+      coords: [2, 4, 6],
+    };
+
+    [h1, h2, h3, v1, v2, v3, d1, d2].forEach((winObj) => {
+      if (str.match(new RegExp(winObj.regex), "g")) {
+        returnArr = winObj.coords;
+      }
+    });
+    return returnArr;
+  };
+
   const checkTie = () => {
     const str = board
       .flatMap((innerArr) => innerArr.map((cell) => cell.getMarker()))
@@ -112,6 +160,7 @@ const GameBoard = (function () {
     returnBoard,
     updateBoard,
     checkWinner,
+    returnWinnerCoords,
     checkTie,
   };
 })();
@@ -130,8 +179,8 @@ function createCell() {
 
 const GameController = (function () {
   const players = [
-    { name: "player1", marker: "X" },
-    { name: "player2", marker: "O" },
+    { name: "X", marker: "X" },
+    { name: "O", marker: "O" },
   ];
   let currentPlayer = players[0];
 
@@ -166,14 +215,16 @@ const GameController = (function () {
 
 cellsDOM.forEach((cell, i) => {
   cell.addEventListener("click", () => {
-    let message = '';
+    let message = "";
     const row = Math.floor(i / 3);
     const col = i % 3;
 
     GameController.playRound(row, col, cell);
     if (GameBoard.checkWinner(GameController.getCurrentPlayer().marker)) {
       message = `${GameController.getCurrentPlayer().name} wins!`;
-      GameBoard.resetBoard();
+      const winIndices = GameBoard.returnWinnerCoords(GameController.getCurrentPlayer().marker);
+      winIndices.forEach(index=>cellsDOM[index].children[0].style.fill = 'var(--mon-yellow)');
+      // GameBoard.resetBoard();
       GameController.switchCurrentPlayer(true);
     } else if (GameBoard.checkTie()) {
       GameBoard.resetBoard();
