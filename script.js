@@ -195,14 +195,12 @@ const GameController = (function () {
     return currentPlayer;
   };
 
-  const printNewRound = () => {};
-
   const playRound = (row, col, domCELL) => {
     if (GameBoard.updateBoard(row, col, currentPlayer.marker, domCELL)) {
+      return true;
     } else {
-      alert("Enter a valid position!");
+      return false;
     }
-    printNewRound();
   };
 
   return {
@@ -215,14 +213,13 @@ const GameController = (function () {
 let resetState = false;
 cellsDOM.forEach((cell, i) => {
   cell.addEventListener("click", () => {
-    let message = "X's turn";
+    let message = `${GameController.getCurrentPlayer().name}'s turn`;
     const row = Math.floor(i / 3);
     const col = i % 3;
     if (resetState) {
       GameBoard.resetBoard();
       resetState = false;
-    } else {
-      GameController.playRound(row, col, cell);
+    } else if (GameController.playRound(row, col, cell)) {
       if (GameBoard.checkWinner(GameController.getCurrentPlayer().marker)) {
         message = `${
           GameController.getCurrentPlayer().name
@@ -247,6 +244,8 @@ cellsDOM.forEach((cell, i) => {
         GameController.switchCurrentPlayer();
         message = `${GameController.getCurrentPlayer().name}'s turn`;
       }
+    } else {
+      message = `Invalid spot! Try again, ${GameController.getCurrentPlayer().name}.`
     }
 
     displayScreen.textContent = message;
